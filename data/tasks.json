@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0.0",
+  "storage_engine": "local-json-dbms",
+  "updated_at": "2026-11-26T06:30:34.168198Z",
+  "integrity": {
+    "checksum": "f00e9ab64374828fd94e3f86559179abe89a782e462f5017e953758ea00bf914",
+    "valid": true,
+    "last_validated_at": "2026-11-26T06:30:34.168198Z",
+    "record_count": 0
+  },
+  "stats": {
+    "total": 0,
+    "completed": 0,
+    "pending": 0,
+    "completion_rate": 0,
+    "ai_score": "—"
+  },
+  "activity": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "tasks": []
+}

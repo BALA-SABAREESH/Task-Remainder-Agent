@@ -1,0 +1,6 @@
+{
+  "name": "NeuralTask — AI Task Intelligence Platform",
+  "description": "AI Task Intelligence Platform with Python LangChain & LangGraph agentic workflows and local JSON file persistence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

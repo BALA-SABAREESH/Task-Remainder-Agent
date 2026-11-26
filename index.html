@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NeuralTask — AI Task Intelligence Platform</title>
+    <meta
+      name="description"
+      content="NeuralTask — AI Task Intelligence Platform with Python LangChain, LangGraph, and local JSON file storage."
+    />
+    <meta
+      property="og:title"
+      content="NeuralTask — AI Task Intelligence Platform"
+    />
+    <meta
+      property="og:description"
+      content="NeuralTask — AI Task Intelligence Platform with Python LangChain, LangGraph, and local JSON file storage."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- 3D Canvas -->
+    <canvas id="hero-canvas"></canvas>
+
+    <!-- Ambient -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Toast -->
+    <div id="toast">
+      <span id="toast-icon">✓</span>
+      <span id="toast-msg">Done</span>
+    </div>
+
+    <!-- ===== NAV ===== -->
+    <nav class="nav">
+      <a class="nav-logo" href="#">
+        <div class="nav-logo-icon">🧠</div>
+        <span class="nav-logo-text">NeuralTask</span>
+      </a>
+      <div class="nav-links">
+        <button class="nav-link active" onclick="smoothScroll('#app')">
+          Dashboard
+        </button>
+        <button class="nav-link" onclick="smoothScroll('#features')">
+          Features
+        </button>
+        <button class="nav-link" onclick="smoothScroll('#analytics')">
+          Analytics
+        </button>
+        <button class="nav-link" onclick="smoothScroll('#terminal-section')">
+          Terminal
+        </button>
+      </div>
+      <div class="nav-actions">
+        <div class="nav-status">
+          <div class="status-dot"></div>
+          Agent Online
+        </div>
+        <button
+          class="theme-toggle"
+          onclick="toggleTheme()"
+          title="Toggle theme"
+          id="theme-btn"
+        >
+          🌙
+        </button>
+      </div>
+    </nav>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero section" id="hero">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Powered by LangGraph · StateGraph Intelligence
+      </div>
+
+      <h1 class="hero-title">
+        Your tasks,<br />
+        <em>intelligently</em> managed<br />
+        with <span class="gradient-text">AI precision</span>
+      </h1>
+
+      <p class="hero-sub">
+        NeuralTask combines LangGraph's agentic AI with a beautiful interface —
+        turning your task chaos into structured, prioritized, intelligent
+        workflows.
+      </p>
+
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="smoothScroll('#app')">
+          🚀 Open Dashboard
+        </button>
+        <button class="btn-secondary" onclick="quickCmd('show')">
+          👁 View Tasks
+        </button>
+      </div>
+
+      <div class="hero-scroll-hint">
+        <span>scroll</span>
+        <div class="scroll-line"></div>
+      </div>
+    </section>
+
+    <!-- ===== MAIN APP ===== -->
+    <div class="page-container" id="app">
+      <!-- Stats Band -->
+      <div class="stats-band anim-fadeUp" id="stats-band">
+        <svg width="0" height="0" style="position: absolute">
+          <defs>
+            <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#7c5cfc" />
+              <stop offset="100%" stop-color="#00e5c0" />
+            </linearGradient>
+            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7c5cfc" stop-opacity="0.6" />
+              <stop offset="100%" stop-color="#7c5cfc" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="stat-card">
+          <div class="stat-label">Total Tasks</div>
+          <div class="stat-top">
+            <div class="stat-num grad-violet" id="stat-total">0</div>
+          </div>
+          <div class="stat-unit" id="stat-total-sub">All time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Completed</div>
+          <div class="stat-num" style="color: var(--cyan)" id="stat-done">
+            0
+          </div>
+          <div class="stat-unit" id="stat-done-pct">0% rate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending</div>
+          <div class="stat-num" style="color: var(--amber)" id="stat-pending">
+            0
+          </div>
+          <div class="stat-unit">In queue</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">AI Score</div>
+          <div class="stat-num" style="color: var(--violet-light)" id="stat-ai">
+            —
+          </div>
+          <div class="stat-unit">Productivity</div>
+        </div>
+      </div>
+
+      <!-- Dashboard Grid -->
+      <div class="dashboard anim-fadeUp delay-1" id="dashboard">
+        <!-- Task List Card -->
+        <div class="card">
+          <div class="card-head">
+            <div
+              class="card-head-icon"
+              style="background: var(--violet-subtle)"
+            >
+              📋
+            </div>
+            <span class="card-head-title">Task List</span>
+            <span class="card-head-badge" id="head-count">0 items</span>
+          </div>
+          <div class="task-list" id="task-list">
+            <div class="empty-state">
+              <span class="empty-icon">📭</span>
+              No tasks yet — add one below
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div style="display: flex; flex-direction: column; gap: 16px">
+          <!-- Progress Card -->
+          <div class="card">
+            <div class="card-head">
+              <div
+                class="card-head-icon"
+                style="background: var(--cyan-subtle)"
+              >
+                📊
+              </div>
+              <span class="card-head-title">Progress</span>
+            </div>
+            <div class="progress-panel">
+              <div class="progress-center">
+                <div class="progress-ring-wrap">
+                  <svg
+                    class="progress-ring-svg"
+                    viewBox="0 0 100 100"
+                    width="100"
+                    height="100"
+                  >
+                    <circle class="ring-bg" cx="50" cy="50" r="40" />
+                    <circle
+                      class="ring-fill"
+                      cx="50"
+                      cy="50"
+                      r="40"
+                      stroke-dasharray="251.2"
+                      stroke-dashoffset="251.2"
+                      id="ring-fill"
+                    />
+                  </svg>
+                  <div class="ring-label">
+                    <div class="ring-pct" id="ring-pct">0%</div>
+                    <div class="ring-sub">done</div>
+                  </div>
+                </div>
+              </div>
+              <div class="mini-stats">
+                <div class="mini-stat">
+                  <div
+                    class="mini-stat-val"
+                    style="color: var(--violet-light)"
+                    id="ms-total"
+                  >
+                    0
+                  </div>
+                  <div class="mini-stat-lbl">Total</div>
+                </div>
+                <div class="mini-stat">
+                  <div
+                    class="mini-stat-val"
+                    style="color: var(--cyan)"
+                    id="ms-done"
+                  >
+                    0
+                  </div>
+                  <div class="mini-stat-lbl">Done</div>
+                </div>
+                <div class="mini-stat">
+                  <div
+                    class="mini-stat-val"
+                    style="color: var(--amber)"
+                    id="ms-pend"
+                  >
+                    0
+                  </div>
+                  <div class="mini-stat-lbl">Left</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Workflow Card -->
+          <div class="card">
+            <div class="card-head">
+              <div
+                class="card-head-icon"
+                style="background: var(--amber-subtle)"
+              >
+                ⚡
+              </div>
+              <span class="card-head-title">Agent Workflow</span>
+              <div class="agent-pulse" id="agent-pulse"></div>
+            </div>
+            <div class="workflow-body">
+              <div class="wf-chain">
+                <div class="wf-node violet">
+                  <span class="wf-node-icon">⌨️</span>
+                  <div>
+                    <div class="wf-node-label" style="color: #a78bfa">
+                      User Input
+                    </div>
+                    <div class="wf-node-desc">Command via CLI / UI</div>
+                  </div>
+                </div>
+                <div class="wf-arrow">↓</div>
+                <div class="wf-node cyan">
+                  <span class="wf-node-icon">🔷</span>
+                  <div>
+                    <div class="wf-node-label" style="color: var(--cyan)">
+                      LangGraph
+                    </div>
+                    <div class="wf-node-desc">StateGraph routing</div>
+                  </div>
+                </div>
+                <div class="wf-arrow">↓</div>
+                <div class="wf-node amber">
+                  <span class="wf-node-icon">🧠</span>
+                  <div>
+                    <div class="wf-node-label" style="color: var(--amber)">
+                      Agent Logic
+                    </div>
+                    <div class="wf-node-desc">add / show / done decision</div>
+                  </div>
+                </div>
+                <div class="wf-arrow">↓</div>
+                <div class="wf-node rose">
+                  <span class="wf-node-icon">💾</span>
+                  <div>
+                    <div class="wf-node-label" style="color: var(--rose)">
+                      Task Memory
+                    </div>
+                    <div class="wf-node-desc">Local JSON store updated</div>
+                  </div>
+                </div>
+                <div class="wf-arrow">↓</div>
+                <div class="wf-node emerald">
+                  <span class="wf-node-icon">📡</span>
+                  <div>
+                    <div class="wf-node-label" style="color: var(--emerald)">
+                      Response
+                    </div>
+                    <div class="wf-node-desc">Result rendered to user</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics Section -->
+      <div id="analytics">
+        <div class="section-divider reveal"></div>
+        <div class="reveal">
+          <div class="section-label">Analytics</div>
+          <div class="section-title">
+            Task <span class="grad-violet">Intelligence</span>
+          </div>
+          <div class="section-sub">
+            Real-time insights from your AI agent on task patterns, completion
+            velocity, and productivity trends.
+          </div>
+        </div>
+
+        <div class="dashboard reveal delay-1" style="margin-bottom: 16px">
+          <!-- Activity Chart -->
+          <div class="card">
+            <div class="card-head">
+              <div
+                class="card-head-icon"
+                style="background: var(--violet-subtle)"
+              >
+                📈
+              </div>
+              <span class="card-head-title">Activity (7 days)</span>
+            </div>
+            <div class="chart-body">
+              <div class="chart-container">
+                <svg
+                  class="chart-svg"
+                  id="chart-svg"
+                  viewBox="0 0 300 90"
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <linearGradient id="cg2" x1="0" y1="0" x2="0" y2="1">
+                      <stop
+                        offset="0%"
+                        stop-color="#7c5cfc"
+                        stop-opacity="0.5"
+                      />
+                      <stop
+                        offset="100%"
+                        stop-color="#7c5cfc"
+                        stop-opacity="0"
+                      />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    class="chart-area"
+                    id="chart-area"
+                    d=""
+                    fill="url(#cg2)"
+                  />
+                  <path class="chart-line" id="chart-line" d="" />
+                  <g id="chart-dots"></g>
+                </svg>
+              </div>
+              <div class="chart-labels" id="chart-labels"></div>
+            </div>
+          </div>
+
+          <!-- AI Insights -->
+          <div class="card">
+            <div class="card-head">
+              <div
+                class="card-head-icon"
+                style="background: var(--amber-subtle)"
+              >
+                🤖
+              </div>
+              <span class="card-head-title">AI Insights</span>
+            </div>
+            <div class="insight-list" id="insights-list">
+              <div class="insight-item">
+                <div
+                  class="insight-icon"
+                  style="background: var(--violet-subtle)"
+                >
+                  ✨
+                </div>
+                <div>
+                  <div class="insight-text">
+                    <strong>Start adding tasks</strong> to unlock AI-powered
+                    recommendations and patterns.
+                  </div>
+                  <div class="insight-time">NeuralTask AI · now</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Terminal Section -->
+      <div id="terminal-section">
+        <div class="section-divider reveal"></div>
+        <div class="reveal">
+          <div class="section-label">Agent Terminal</div>
+          <div class="section-title">
+            Command <span class="grad-violet">Interface</span>
+          </div>
+          <div class="section-sub">
+            Talk directly to the LangGraph agent. Type commands or use quick
+            shortcuts below.
+          </div>
+        </div>
+
+        <!-- AI Suggest Bar -->
+        <div
+          class="ai-suggest-bar reveal"
+          id="ai-suggest-bar"
+          onclick="insertSuggestion()"
+        >
+          <span class="ai-spark">⚡</span>
+          <div class="ai-suggest-text">
+            <strong>AI Suggestion:</strong>
+            <span id="ai-suggest-text"
+              >Try adding "Review project roadmap" as your first task</span
+            >
+          </div>
+          <span
+            style="
+              font-size: 11px;
+              font-family: var(--font-mono);
+              color: var(--text-dim);
+            "
+            >click to use →</span
+          >
+        </div>
+
+        <!-- Terminal -->
+        <div class="terminal-card reveal delay-1">
+          <div class="term-titlebar">
+            <div class="tdot tdot-r"></div>
+            <div class="tdot tdot-y"></div>
+            <div class="tdot tdot-g"></div>
+            <div class="term-title-text">~ neuraltask — agent terminal</div>
+            <button class="term-clear" onclick="clearTerminal()">clear</button>
+          </div>
+          <div class="term-body" id="terminal">
+            <div class="t-info">
+              ── NeuralTask Agent (LangGraph · LangChain · Python) ──
+            </div>
+            <div class="t-info">
+              Commands: add &lt;task&gt; · show · done &lt;n&gt; · delete &lt;n&gt; · process &lt;doc&gt; · validate · ai · exit
+            </div>
+            <div class="t-info">
+              ──────────────────────────────────────────────────
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Row -->
+        <div class="input-zone reveal delay-2">
+          <div class="input-row">
+            <div class="input-shell">
+              <span class="input-prompt-sym">$</span>
+              <input
+                type="text"
+                class="cmd-input"
+                id="cmd-input"
+                placeholder="add review project roadmap…"
+                autocomplete="off"
+              />
+              <span class="input-hint">↵ enter</span>
+            </div>
+            <button class="run-btn" onclick="runCmd()">Run →</button>
+          </div>
+        </div>
+
+        <!-- Quick Commands -->
+        <div class="quick-row reveal delay-3">
+          <div class="qcmd" onclick="quickCmd('add ')">
+            <span class="qcmd-icon">➕</span> add <span>&lt;task&gt;</span>
+          </div>
+          <div class="qcmd" onclick="quickCmd('show')">
+            <span class="qcmd-icon">👁</span> show
+          </div>
+          <div class="qcmd" onclick="quickCmd('done ')">
+            <span class="qcmd-icon">✔</span> done <span>&lt;n&gt;</span>
+          </div>
+          <div class="qcmd" onclick="quickCmd('ai')">
+            <span class="qcmd-icon">🤖</span> ai analyze
+          </div>
+        </div>
+      </div>
+
+      <!-- Features Section -->
+      <div id="features">
+        <div class="section-divider reveal"></div>
+        <div class="reveal">
+          <div class="section-label">Features</div>
+          <div class="section-title">
+            Everything you need to <span class="grad-violet">ship faster</span>
+          </div>
+          <div class="section-sub">
+            A complete AI task management platform built on LangGraph's agentic
+            infrastructure.
+          </div>
+        </div>
+
+        <div class="features-grid reveal">
+          <div class="feature-card" style="--accent-color: var(--violet)">
+            <div class="feature-icon" style="--icon-bg: var(--violet-subtle)">
+              🧠
+            </div>
+            <h3>Agentic Intelligence</h3>
+            <p>
+              LangGraph StateGraph powers a real AI agent that understands
+              context, routes commands intelligently, and maintains persistent
+              memory across your workflow.
+            </p>
+          </div>
+          <div class="feature-card" style="--accent-color: var(--cyan)">
+            <div class="feature-icon" style="--icon-bg: var(--cyan-subtle)">
+              ⚡
+            </div>
+            <h3>Real-time Processing</h3>
+            <p>
+              Every command is processed instantly through the agent pipeline
+              with live UI updates, animated state transitions, and visual
+              feedback on every action.
+            </p>
+          </div>
+          <div class="feature-card" style="--accent-color: var(--amber)">
+            <div class="feature-icon" style="--icon-bg: var(--amber-subtle)">
+              📊
+            </div>
+            <h3>Smart Analytics</h3>
+            <p>
+              AI-generated insights analyze your task patterns, completion
+              velocity, and productivity rhythms to surface actionable
+              recommendations.
+            </p>
+          </div>
+          <div class="feature-card" style="--accent-color: var(--rose)">
+            <div
+              class="feature-icon"
+              style="--icon-bg: rgba(255, 77, 109, 0.08)"
+            >
+              🎯
+            </div>
+            <h3>Priority Engine</h3>
+            <p>
+              The AI automatically assigns priority levels and estimates effort,
+              keeping your most important work front and center at all times.
+            </p>
+          </div>
+          <div class="feature-card" style="--accent-color: var(--emerald)">
+            <div class="feature-icon" style="--icon-bg: var(--emerald-subtle)">
+              🌙
+            </div>
+            <h3>Dark / Light Mode</h3>
+            <p>
+              Fully theme-aware design with smooth transitions. Adapts to your
+              visual preference while maintaining all glassmorphism and glow
+              effects.
+            </p>
+          </div>
+          <div class="feature-card" style="--accent-color: var(--violet-light)">
+            <div class="feature-icon" style="--icon-bg: var(--violet-subtle)">
+              📱
+            </div>
+            <h3>Fully Responsive</h3>
+            <p>
+              Pixel-perfect layouts on every device — mobile, tablet, desktop.
+              Built with CSS Grid and fluid typography for a native feel
+              everywhere.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer reveal">
+        <div class="footer-brand">
+          Built with <b>LangGraph</b> · <b>Python</b> · <b>Pydantic</b> ·
+          <b>AI</b>
+        </div>
+        <div class="footer-tags">
+          <span class="ftag">Agentic AI</span>
+          <span class="ftag">StateGraph</span>
+          <span class="ftag">LangGraph</span>
+          <span class="ftag">JSON DBMS</span>
+          <span class="ftag">CLI</span>
+          <span class="ftag">Dark Mode</span>
+        </div>
+      </div>
+    </div>
+    <!-- /page-container -->
+
+    <script src="main.js"></script>
+  </body>
+</html>
